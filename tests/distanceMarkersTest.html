@@ -1,0 +1,58 @@
+<html>
+<head>
+<title>Distance Markers Unit Test</title>
+	<script type="text/javascript" charset="utf-8" src="http://code.jquery.com/jquery-1.3.2.js"></script>
+	<script type="text/javascript" charset="utf-8" src="http://yui.yahooapis.com/3.1.0/build/yui/yui-min.js"></script>
+	<script type="text/javascript" src="../spherical_formulas.js"></script>
+	<script type="text/javascript" src="../distanceMarkers.js"></script>
+	
+	<script type="text/javascript">
+		var LatLngFactory = {
+			fromLatLngDS: function( latLngDS ) {
+				return new LatLon( latLngDS.lat, latLngDS.lng );
+			}
+		}
+	
+		YUI( { useBrowserConsole: true } ).use( 'test', function( Y ) {
+			var testCase = new Y.Test.Case( {
+				name: 'Test Distance Markers',
+				setUp: function() {
+					this.points = [{lng:-119.960403442383,lat:38.9411860960343},{lng:-119.960489273071,lat:38.9433223321388},{lng:-119.961433410645,lat:38.9432555757348},{lng:-119.961776733398,lat:38.9397841561114},{lng:-119.962205886841,lat:38.9370469554206},{lng:-119.95662689209,lat:38.9409190619956},{lng:-119.954137802124,lat:38.9382486662957},{lng:-119.952335357666,lat:38.9410525791407},{lng:-119.948816299438,lat:38.9364460923462},{lng:-119.952335357666,lat:38.9410525791407},{lng:-119.94649887085,lat:38.9534018277762},{lng:-119.960832595825,lat:38.9470605904414},{lng:-119.960403442383,lat:38.9411860960343}];
+					
+					this.distanceMarkerCalculator = new DistanceMarkerPointsCalculator();
+					this.distanceMarkerCalculator.init();
+					
+				},
+				
+				tearDown: function() {
+					this.distanceMarkerCalculator = null;
+					this.points = null;
+				},
+				
+				testGetMarkers: function() {
+					for( var index = 0, point; point = this.points[ index ]; ++index ) {
+						var latLon = LatLngFactory.fromLatLngDS( point );
+						this.distanceMarkerCalculator.addLatLon( latLon );
+					}
+
+					var markers = this.distanceMarkerCalculator.getDistanceMarkerPoints( 1.0 );
+					Y.Assert.areEqual( 7, markers.length, 'Correct number of markers returned for 1km' );
+
+					var markers = this.distanceMarkerCalculator.getDistanceMarkerPoints( 0.5 );
+					Y.Assert.areEqual( 14, markers.length, 'Correct number of markers returned for 500m' );
+					
+					var markers = this.distanceMarkerCalculator.getDistanceMarkerPoints( 0.1 );
+					Y.Assert.areEqual( 71, markers.length, 'Correct number of markers returned for 100m' );
+				}
+			} );
+			
+			var testRunner = Y.Test.Runner;
+			
+			testRunner.add( testCase );
+			Y.Test.Runner.run();
+		} );
+	</script>
+</head>
+<body>
+</body>
+</html>
